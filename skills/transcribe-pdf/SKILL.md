@@ -16,6 +16,7 @@ This skill writes images and a running `transcription.md`. If your Copilot CLI a
 - **Don’t overdo it**: transcribe what’s legible in the page image; use placeholders for uncertain/unreadable parts.
 - **No zoom / no slicing unless necessary**: prefer the already-cropped full-page image.
 - **Do not stop to ask**: after starting, continue through all pages, appending as you go.
+- **Write scripts to a file**: if you need to run a script, write it to a file and then execute it. Piping commands do not work well for complex scripts or in Windows PowerShell.
 
 ## Why cropping matters (key finding)
 
@@ -51,9 +52,11 @@ python "<skill_root>\scripts\render_and_crop_pdf.py" "<pdf_path>" "<out_dir>" --
 ```
 
 Outputs:
+
 - `"<out_dir>\cropped\page-01.png"`, `page-02.png`, … (canonical inputs for transcription)
 
 Crop defaults are tuned to remove common header/footer bars at `--zoom 2.0`:
+
 - `--top 280 --bottom 140` (adjust if needed)
 
 ### 3) Transcribe the whole document, one page at a time (LLM vision)
