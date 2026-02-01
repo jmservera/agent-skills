@@ -47,7 +47,7 @@ If the samples show ~0 characters or only metadata, proceed with image transcrip
 
 If the workspace already contains correctly-cropped `page-*.png` images, **skip to Step 3**.
 
-**Recommended**: render + crop in one run.
+**Recommended**: render the first 5 images, analyze if they need cropping, then run the full render+crop command or just render if no cropping is needed.
 
 ```powershell
 python "<skill_root>\scripts\render_and_crop_pdf.py" "<pdf_path>" "<out_dir>" --zoom 2.0
@@ -59,7 +59,7 @@ Outputs:
 
 Crop defaults are tuned to remove common header/footer bars at `--zoom 2.0`:
 
-- `--top 280 --bottom 140` (adjust if needed)
+- `--top 280 --bottom 140` (adjust if needed, it may be 0 0 for documents that don't need cropping)
 
 ### 3) Transcribe the whole document, one page at a time (LLM vision)
 
