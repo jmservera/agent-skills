@@ -29,47 +29,63 @@ Many archival viewers add header/footer UI bars (e.g., “PARES …”). These r
 
 ### 0) Install dependencies (once)
 
-```powershell
-pip install -r "<skill_root>\scripts\requirements.txt"
+It is recommended to use a virtual environment to avoid conflicts with system packages.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r "<skill_root>/scripts/requirements.txt"
 ```
 
 ### 1) (Optional) Confirm there is no usable text layer
 
 This is a quick sanity check to avoid wasting time trying to extract text that isn’t there.
 
-```powershell
-python "<skill_root>\scripts\check_text_layer_sample.py" "<pdf_path>"
+```bash
+python "<skill_root>/scripts/check_text_layer_sample.py" "<pdf_path>"
 ```
 
 If the samples show ~0 characters or only metadata, proceed with image transcription.
 
 ### 2) Prepare images for the whole PDF (single command)
 
-If the workspace already contains correctly-cropped `page-*.png` images, **skip to Step 3**.
+This skill uses an intelligent script that:
 
-**Recommended**: render the first 5 images, analyze if they need cropping, then run the full render+crop command or just render if no cropping is needed.
+1. Automatically analyzes a random sample of pages to check for headers/footers.
+2. Automatically detects content bounding boxes (smart crop).
+3. Splits double-page scans (landscape) into single pages.
+4. Skips blank pages.
 
-```powershell
-python "<skill_root>\scripts\render_and_crop_pdf.py" "<pdf_path>" "<out_dir>" --zoom 2.0
+Run the smart processing command:
+
+```bash
+python "<skill_root>/scripts/render_and_crop_pdf.py" "<pdf_path>" "<out_dir>" --zoom 2.0
 ```
+
+**Note**: The script ignores `--top`, `--bottom`, etc. as it uses computer vision to find the content.
 
 Outputs:
 
-- `"<out_dir>\cropped\page-01.png"`, `page-02.png`, … (canonical inputs for transcription)
+- `"<out_dir>/cropped/page-01.png"`, `page-02.png`, etc.
+- Logs indicating which pages were split or skipped.
 
-Crop defaults are tuned to remove common header/footer bars at `--zoom 2.0`:
-
-- `--top 280 --bottom 140` (adjust if needed, it may be 0 0 for documents that don't need cropping)
+Verify the first few output images to ensure headers are removed and content is preserved. If automatic cropping fails, you may need to modify the `smart_crop` function in `render_and_crop_pdf.py`.
 
 ### 3) Transcribe the whole document, one page at a time (LLM vision)
 
 Create the transcript file if it doesn’t exist, then append each page immediately (never hold results in chat).
 
-- Transcript path: `"<out_dir>\transcription.md"`
-- For each page image in `"<out_dir>\cropped"`:
-  1. Open/view **exactly one** image (e.g., `page-21.png`).
+- Transcript path: `"<out_dir>/transcription.md"`
+- For each page image in `"<out_dir>/cropped"`:
+  - **Sorting Order**:
+    - Sort files alphabetically.
+    - If a page was split into `page-###L.png` and `page-###R.png`:
+      - Process `L` (Left) first.
+      - Process `R` (Right) second.
+      - E.g. `page-006L.png` then `page-006R.png`.
+  1. Open/view **exactly one** image (e.g., `page-021.png` or `page-006L.png`).
   2. Transcribe what you can see into Markdown.
-  3. Append immediately to the transcript under a heading `## Page N`.
+  3. Append immediately to the transcript under a heading `## Page N` (use the file name suffix if useful, e.g. `## Page 6 (Left)`).
   4. Move to the next page and repeat until the final page.
 
 ### Transcription conventions
@@ -82,7 +98,5 @@ Create the transcript file if it doesn’t exist, then append each page immediat
 
 ## Helper scripts included
 
-- `render_pdf_to_images.py`: render PDF pages to PNGs.
-- `render_and_crop_pdf.py`: render + crop in one command (preferred).
-- `crop_images.py`: crop an existing set of `page-*.png` images.
+- `render_and_crop_pdf.py`: render + smart crop in one command (preferred).
 - `check_text_layer_sample.py`: sample embedded PDF text layer (non-OCR).
