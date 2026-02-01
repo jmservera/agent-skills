@@ -16,7 +16,9 @@ This skill writes images and a running `transcription.md`. If your Copilot CLI a
 - **Don’t overdo it**: transcribe what’s legible in the page image; use placeholders for uncertain/unreadable parts.
 - **No zoom / no slicing unless necessary**: prefer the already-cropped full-page image.
 - **Do not stop to ask**: after starting, continue through all pages, appending as you go.
-- **Write scripts to a file**: if you need to run a script, write it to a file and then execute it. Piping commands do not work well for complex scripts or in Windows PowerShell.
+- **Use Markdown**: transcribe into a single Markdown file, with headings for each page. Append directly to the file.
+- **Use the provided scripts**: use the included Python scripts for rendering/cropping; do not invent your own methods.
+- **Write scripts to a file**: especially if running on Windows PowerShell, if you need to run a script, write it to a file and then execute it. When running on any Linux shell, you can run scripts inline.
 
 ## Why cropping matters (key finding)
 
@@ -76,7 +78,7 @@ Create the transcript file if it doesn’t exist, then append each page immediat
 - Use placeholders instead of guessing:
   - `[ilegible]` for unreadable words/lines
   - `[¿…?]` for uncertain readings
-- If a page is blank or non-text: write `[Página en blanco]` or a short note.
+- If a page is blank or non-text: write `[Página en blanco]` or `[Blank page]` or a short note.
 
 ## Helper scripts included
 
