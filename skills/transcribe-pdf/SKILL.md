@@ -12,6 +12,7 @@ This skill writes images and a running `transcription.md`. If your Copilot CLI a
 ## Hard rules (must follow)
 
 - **NO OCR**: do not run OCR tools or OCR libraries. Transcription must be done using **LLM vision**.
+- **No web search**: do not search the web for any content.
 - **Whole document, one page at a time**: render/prepare images for the whole PDF once, but **transcribe sequentially page-by-page** (never batch multiple pages into one vision prompt).
 - **Don’t overdo it**: transcribe what’s legible in the page image; use placeholders for uncertain/unreadable parts.
 - **No zoom / no slicing unless necessary**: prefer the already-cropped full-page image.
